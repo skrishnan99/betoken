@@ -15,6 +15,11 @@ import 'github.com/oraclize/ethereum-api/oraclizeAPI.sol';
 contract GroupFund is usingOraclize {
   using SafeMath for uint256;
 
+  // Timeline:
+  // - ChangeMaking: Deposit / Withdrawals / Add new participants
+  // - ProposalMaking: Make new proposals
+  // - Waiting: Investment stage
+  // - Ended: Redistribution stage
   enum CyclePhase { ChangeMaking, ProposalMaking, Waiting, Ended }
 
   struct Proposal {
@@ -130,6 +135,7 @@ contract GroupFund is usingOraclize {
     public
   {
     require(_timeOfChangeMaking.add(_timeOfProposalMaking) <= _timeOfCycle);
+
     etherDeltaAddr = _etherDeltaAddr;
     decimals = _decimals;
     timeOfCycle = _timeOfCycle;
@@ -156,6 +162,8 @@ contract GroupFund is usingOraclize {
     etherDelta = EtherDelta(etherDeltaAddr);
   }
 
+
+
   // Creates a new Cycle
   function startNewCycle() public {
     require(cyclePhase == CyclePhase.Ended);
@@ -167,13 +175,16 @@ contract GroupFund is usingOraclize {
     CycleStarted(now);
   }
 
-  //Change making time functions
 
+
+  // Function that allows Participants to deposit into GroupFund
   function deposit()
     public
     payable
     isChangeMakingTime
   {
+    // If not a Participant, add them to the GroupFund
+    // Note that once a Participant is added, they're never removed
     if (!isParticipant[msg.sender]) {
       participants.push(msg.sender);
       isParticipant[msg.sender] = true;
@@ -181,8 +192,11 @@ contract GroupFund is usingOraclize {
 
     //Register investment
     uint256 fees = msg.value.mul(oraclizeFeeProportion).div(10**decimals);
-    balanceOf[msg.sender] = balanceOf[msg.sender].add(msg.value).sub(fees);
-    totalFundsInWeis = totalFundsInWeis.add(msg.value).sub(fees);
+    uint 256 resultantBalance = msg.value.sub(fees);
+
+    // Update the deposit, sans oraclizeFees
+    balanceOf[msg.sender] = balanceOf[msg.sender].add(resultantBalance);
+    totalFundsInWeis = totalFundsInWeis.add(resultantBalance);
 
     if (isFirstCycle) {
       //Give control tokens proportional to investment
@@ -192,6 +206,8 @@ contract GroupFund is usingOraclize {
     }
   }
 
+
+
   // Withdraw from GroupFund
   function withdraw(uint256 _amountInWeis)
     public
@@ -200,11 +216,14 @@ contract GroupFund is usingOraclize {
   {
     require(!isFirstCycle);
 
+    // Update the balance as well as total funds
     totalFundsInWeis = totalFundsInWeis.sub(_amountInWeis);
     balanceOf[msg.sender] = balanceOf[msg.sender].sub(_amountInWeis);
 
     msg.sender.transfer(_amountInWeis);
   }
+
+
 
   // Move on to Proposal Making time
   function endChangeMakingTime() public {
@@ -215,6 +234,8 @@ contract GroupFund is usingOraclize {
 
     ChangeMakingTimeEnded(now);
   }
+
+
 
   //Proposal Making time functions
   function createProposal(
@@ -244,6 +265,10 @@ contract GroupFund is usingOraclize {
     supportProposal(proposalId, _amountInWeis);
   }
 
+
+
+  // Supporting a proposal:
+  // - Updates the amount of Control Tokens staked
   function supportProposal(uint256 _proposalId, uint256 _amountInWeis)
     public
     isProposalMakingTime
