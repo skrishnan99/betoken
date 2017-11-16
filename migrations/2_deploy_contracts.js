@@ -2,8 +2,8 @@ var GroupFund = artifacts.require("GroupFund");
 
 module.exports = function(deployer) {
   deployer.deploy(
-    GroupFund,
-    "0x228344536a03c0910fb8be9c2755c1a0ba6f89e1", //Ethdelta address
+    GroupFund
+    /* "0x228344536a03c0910fb8be9c2755c1a0ba6f89e1", //Ethdelta address
     18, //decimals
     30 * 24 * 3600, //timeOfCycle
     2 * 24 * 3600, //timeOfChangeMaking
@@ -12,6 +12,13 @@ module.exports = function(deployer) {
     20, //maxProposals
     0.01 * Math.pow(10, 18), //commissionRate
     3600 / 20, //orderExpirationTimeInBlocks
-    0.01 * Math.pow(10, 18) //oraclizeFeeProportion
+    0.01 * Math.pow(10, 18) //oraclizeFeeProportion */
   );
 };
+
+GroupFund.new().then(function(instance) {
+  // Print the new address
+  console.log(instance.address);
+}).catch(function(err) {
+  // There was an error! Handle it.
+});
