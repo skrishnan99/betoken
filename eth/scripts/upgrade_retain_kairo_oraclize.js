@@ -12,7 +12,7 @@
 
   dev_fee_address = "0xDbE011EB3fe8C77C94Cc9d9EC176BDddC937F425";
 
-  old_address = "0x8562D0E4E2853493E5d908Ec1caAa05604d48605";
+  old_address = "0x7c9c1ca8abe245e34bcd56d88ef320560ace7a4e";
 
   start_cycle_number = 0;
 
@@ -52,16 +52,18 @@
           });
         };
         getAllItems = (function() {
-          var i, ref, results;
+          var j, ref, results;
           results = [];
-          for (id = i = 0, ref = count - 1; undefined !== 0 && (0 <= ref ? 0 <= i && i <= ref : 0 >= i && i >= ref); id = 0 <= ref ? ++i : --i) {
+          for (id = j = 0, ref = count - 1; undefined !== 0 && (0 <= ref ? 0 <= j && j <= ref : 0 >= j && j >= ref); id = 0 <= ref ? ++j : --j) {
             results.push(getItem(id));
           }
           return results;
         })();
         return Promise.all(getAllItems);
       }).then(function() {
-        new_contract.initializeParticipants(participants);
+        new_contract.initializeParticipants(participants.filter(function(v, i, a) {
+          return a.indexOf(v) === i;
+        }));
         return console.log("Initializing participant list...");
       //Initialize subcontracts for new BetokenFund
       }).then(function() {

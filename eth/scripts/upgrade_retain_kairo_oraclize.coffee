@@ -5,7 +5,7 @@ OraclizeHandler = artifacts.require("OraclizeHandler")
 config = require "../deployment_configs/testnet.json"
 
 dev_fee_address = "0xDbE011EB3fe8C77C94Cc9d9EC176BDddC937F425"
-old_address = "0x8562D0E4E2853493E5d908Ec1caAa05604d48605"
+old_address = "0x7c9c1ca8abe245e34bcd56d88ef320560ace7a4e"
 start_cycle_number = 0
 
 module.exports = (callback) ->
@@ -64,7 +64,7 @@ module.exports = (callback) ->
           return Promise.all(getAllItems)
       ).then(
         () ->
-          new_contract.initializeParticipants(participants)
+          new_contract.initializeParticipants(participants.filter((v, i, a) -> a.indexOf(v) == i))
           console.log "Initializing participant list..."
       ).then(
         #Initialize subcontracts for new BetokenFund
