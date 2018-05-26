@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 
-class myAccount extends Component {
+class MyAccount extends Component {
   render() {
     return (
       <div>
-        <p>hi</p>
-        <h1>myAccount</h1>
+        <p>Hello1</p>
       </div>
     );
   }
 }
-
-export default myAccount;
+export default MyAccount;
