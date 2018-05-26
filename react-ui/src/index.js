@@ -6,7 +6,7 @@ import registerServiceWorker from "./registerServiceWorker";
 
 import { Betoken } from "./objects/betoken.js";
 
-import init from "./body";
+import { init } from "./body";
 
 init();
 

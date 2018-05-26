@@ -4,29 +4,25 @@
  * Sets the first account as defaultAccount
  * @return {Promise} .then(()->)
  */
-import BigNumber from "big-number";
-
 var ERC20, ETH_TOKEN_ADDRESS, Web3, getDefaultAccount, web3;
 
+import BigNumber from "bignumber.js";
+
 //Import web3
-Web3 = require("web3");
+Web3 = require('web3');
 
 web3 = window.web3;
 
 if (typeof web3 !== "undefined") {
   web3 = new Web3(web3.currentProvider);
 } else {
-  web3 = new Web3(
-    new Web3.providers.HttpProvider(
-      "https://rinkeby.infura.io/m7Pdc77PjIwgmp7t0iKI"
-    )
-  );
+  web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/m7Pdc77PjIwgmp7t0iKI"));
 }
 
 ETH_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 getDefaultAccount = async function() {
-  return (web3.eth.defaultAccount = (await web3.eth.getAccounts())[0]);
+  return web3.eth.defaultAccount = ((await web3.eth.getAccounts()))[0];
 };
 
 ERC20 = function(_tokenAddr) {
@@ -80,10 +76,7 @@ export var Betoken = function(_address) {
    * @return {Promise}              .then((_value)->)
    */
   self.getDoubleMapping = function(_mappingName, _input1, _input2) {
-    return self.contracts.betokenFund.methods[_mappingName](
-      _input1,
-      _input2
-    ).call();
+    return self.contracts.betokenFund.methods[_mappingName](_input1, _input2).call();
   };
   self.getTokenSymbol = function(_tokenAddr) {
     _tokenAddr = web3.utils.toHex(_tokenAddr);
@@ -92,9 +85,7 @@ export var Betoken = function(_address) {
         return "ETH";
       });
     }
-    return ERC20(_tokenAddr)
-      .methods.symbol()
-      .call();
+    return ERC20(_tokenAddr).methods.symbol().call();
   };
   self.getTokenDecimals = function(_tokenAddr) {
     _tokenAddr = web3.utils.toHex(_tokenAddr);
@@ -103,9 +94,7 @@ export var Betoken = function(_address) {
         return 18;
       });
     }
-    return ERC20(_tokenAddr)
-      .methods.decimals()
-      .call();
+    return ERC20(_tokenAddr).methods.decimals().call();
   };
   /**
    * Gets the Kairo balance of an address
@@ -139,12 +128,9 @@ export var Betoken = function(_address) {
    */
   self.nextPhase = async function(_callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .nextPhase()
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.nextPhase().send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /*
   ChangeMakingTime functions
@@ -159,40 +145,27 @@ export var Betoken = function(_address) {
     var funcSignature;
     funcSignature = web3.eth.abi.encodeFunctionSignature("deposit()");
     await getDefaultAccount();
-    return web3.eth
-      .sendTransaction({
-        from: web3.eth.defaultAccount,
-        to: self.addrs.betokenFund,
-        value: _amountInWeis,
-        data: funcSignature
-      })
-      .on("transactionHash", _callback);
+    return web3.eth.sendTransaction({
+      from: web3.eth.defaultAccount,
+      to: self.addrs.betokenFund,
+      value: _amountInWeis,
+      data: funcSignature
+    }).on("transactionHash", _callback);
   };
   self.depositToken = async function(_tokenAddr, _tokenAmount, _callback) {
     var amount, token;
     await getDefaultAccount();
     token = ERC20(_tokenAddr);
-    amount = BigNumber(_tokenAmount).mul(
-      BigNumber(10).toPower(await self.getTokenDecimals(_tokenAddr))
-    );
-    await token.methods
-      .approve(self.addrs.betokenFund, amount)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
-    await self.contracts.betokenFund.methods
-      .depositToken(_tokenAddr, amount)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
-    return await token.methods
-      .approve(self.addrs.betokenFund, 0)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    amount = BigNumber(_tokenAmount).mul(BigNumber(10).toPower((await self.getTokenDecimals(_tokenAddr))));
+    await token.methods.approve(self.addrs.betokenFund, amount).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
+    await self.contracts.betokenFund.methods.depositToken(_tokenAddr, amount).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
+    return (await token.methods.approve(self.addrs.betokenFund, 0).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback));
   };
   /**
    * Allows user to withdraw from GroupFund balance
@@ -202,23 +175,17 @@ export var Betoken = function(_address) {
    */
   self.withdraw = async function(_amountInWeis, _callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .withdraw(_amountInWeis)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.withdraw(_amountInWeis).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   self.withdrawToken = async function(_tokenAddr, _amountInDAI, _callback) {
     var amount;
     await getDefaultAccount();
     amount = BigNumber(_amountInDAI).mul(1e18);
-    return self.contracts.betokenFund.methods
-      .withdrawToken(_tokenAddr, amount)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.withdrawToken(_tokenAddr, amount).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /**
    * Withdraws all of user's balance in cases of emergency
@@ -227,12 +194,9 @@ export var Betoken = function(_address) {
    */
   self.emergencyWithdraw = async function(_callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .emergencyWithdraw()
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionhash", _callback);
+    return self.contracts.betokenFund.methods.emergencyWithdraw().send({
+      from: web3.eth.defaultAccount
+    }).on("transactionhash", _callback);
   };
   /**
    * Sends Kairo to another address
@@ -243,12 +207,9 @@ export var Betoken = function(_address) {
    */
   self.sendKairo = async function(_to, _amountInWeis, _callback) {
     await getDefaultAccount();
-    return self.contracts.controlToken.methods
-      .transfer(_to, _amountInWeis)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.controlToken.methods.transfer(_to, _amountInWeis).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /**
    * Sends Shares to another address
@@ -259,12 +220,9 @@ export var Betoken = function(_address) {
    */
   self.sendShares = async function(_to, _amountInWeis, _callback) {
     await getDefaultAccount();
-    return self.contracts.shareToken.methods
-      .transfer(_to, _amountInWeis)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.shareToken.methods.transfer(_to, _amountInWeis).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /*
   ProposalMakingTime functions
@@ -276,48 +234,37 @@ export var Betoken = function(_address) {
   self.getInvestments = function(_userAddress) {
     var array;
     array = [];
-    return self.contracts.betokenFund.methods
-      .investmentsCount(_userAddress)
-      .call()
-      .then(function(_count) {
-        var count, getAllItems, getItem, id;
-        count = +_count;
-        if (count === 0) {
-          return [];
+    return self.contracts.betokenFund.methods.investmentsCount(_userAddress).call().then(function(_count) {
+      var count, getAllItems, getItem, id;
+      count = +_count;
+      if (count === 0) {
+        return [];
+      }
+      array = new Array(count);
+      getItem = function(id) {
+        return self.contracts.betokenFund.methods.userInvestments(_userAddress, id).call().then(function(_item) {
+          return new Promise(function(fullfill, reject) {
+            if (typeof _item !== null) {
+              array[id] = _item;
+              fullfill();
+            } else {
+              reject();
+            }
+          });
+        });
+      };
+      getAllItems = (function() {
+        var i, ref, results;
+        results = [];
+        for (id = i = 0, ref = count - 1; (0 <= ref ? i <= ref : i >= ref); id = 0 <= ref ? ++i : --i) {
+          results.push(getItem(id));
         }
-        array = new Array(count);
-        getItem = function(id) {
-          return self.contracts.betokenFund.methods
-            .userInvestments(_userAddress, id)
-            .call()
-            .then(function(_item) {
-              return new Promise(function(fullfill, reject) {
-                if (typeof _item !== null) {
-                  array[id] = _item;
-                  fullfill();
-                } else {
-                  reject();
-                }
-              });
-            });
-        };
-        getAllItems = (function() {
-          var i, ref, results;
-          results = [];
-          for (
-            id = i = 0, ref = count - 1;
-            0 <= ref ? i <= ref : i >= ref;
-            id = 0 <= ref ? ++i : --i
-          ) {
-            results.push(getItem(id));
-          }
-          return results;
-        })();
-        return Promise.all(getAllItems);
-      })
-      .then(function() {
-        return array;
-      });
+        return results;
+      })();
+      return Promise.all(getAllItems);
+    }).then(function() {
+      return array;
+    });
   };
   /**
    * Creates proposal
@@ -326,48 +273,32 @@ export var Betoken = function(_address) {
    * @param  {Function} _callback will be called after tx hash is generated
    * @return {Promise}               .then(()->)
    */
-  self.createInvestment = async function(
-    _tokenAddress,
-    _stakeInWeis,
-    _callback
-  ) {
+  self.createInvestment = async function(_tokenAddress, _stakeInWeis, _callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .createInvestment(_tokenAddress, _stakeInWeis)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.createInvestment(_tokenAddress, _stakeInWeis).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   self.sellAsset = async function(_proposalId, _callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .sellInvestmentAsset(_proposalId)
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.sellInvestmentAsset(_proposalId).send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /*
   Finalized Phase functions
   */
   self.redeemCommission = async function(_callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .redeemCommission()
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.redeemCommission().send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   self.redeemCommissionInShares = async function(_callback) {
     await getDefaultAccount();
-    return self.contracts.betokenFund.methods
-      .redeemCommissionInShares()
-      .send({
-        from: web3.eth.defaultAccount
-      })
-      .on("transactionHash", _callback);
+    return self.contracts.betokenFund.methods.redeemCommissionInShares().send({
+      from: web3.eth.defaultAccount
+    }).on("transactionHash", _callback);
   };
   /*
   Object Initialization
@@ -377,36 +308,23 @@ export var Betoken = function(_address) {
     //Initialize GroupFund contract
     self.addrs.betokenFund = _address;
     betokenFundABI = require("./abi/BetokenFund.json").abi;
-    self.contracts.betokenFund = new web3.eth.Contract(
-      betokenFundABI,
-      self.addrs.betokenFund
-    );
+    self.contracts.betokenFund = new web3.eth.Contract(betokenFundABI, self.addrs.betokenFund);
     //Get ControlToken address
-    return self.contracts.betokenFund.methods
-      .controlTokenAddr()
-      .call()
-      .then(function(_controlTokenAddr) {
-        var controlTokenABI;
-        //Initialize ControlToken contract
-        self.addrs.controlToken = _controlTokenAddr;
-        controlTokenABI = require("./abi/ControlToken.json").abi;
-        self.contracts.controlToken = new web3.eth.Contract(
-          controlTokenABI,
-          self.addrs.controlToken
-        );
-        //Get ShareToken address
-        return self.contracts.betokenFund.methods.shareTokenAddr().call();
-      })
-      .then(function(_shareTokenAddr) {
-        var shareTokenABI;
-        //Initialize ShareToken contract
-        self.addrs.shareToken = _shareTokenAddr;
-        shareTokenABI = require("./abi/ShareToken.json").abi;
-        return (self.contracts.shareToken = new web3.eth.Contract(
-          shareTokenABI,
-          self.addrs.shareToken
-        ));
-      });
+    return self.contracts.betokenFund.methods.controlTokenAddr().call().then(function(_controlTokenAddr) {
+      var controlTokenABI;
+      //Initialize ControlToken contract
+      self.addrs.controlToken = _controlTokenAddr;
+      controlTokenABI = require("./abi/ControlToken.json").abi;
+      self.contracts.controlToken = new web3.eth.Contract(controlTokenABI, self.addrs.controlToken);
+      //Get ShareToken address
+      return self.contracts.betokenFund.methods.shareTokenAddr().call();
+    }).then(function(_shareTokenAddr) {
+      var shareTokenABI;
+      //Initialize ShareToken contract
+      self.addrs.shareToken = _shareTokenAddr;
+      shareTokenABI = require("./abi/ShareToken.json").abi;
+      return self.contracts.shareToken = new web3.eth.Contract(shareTokenABI, self.addrs.shareToken);
+    });
   };
   return self;
 };
