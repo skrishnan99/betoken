@@ -5,6 +5,9 @@ import App from "./App";
 
 import { init } from "./body";
 
-init();
+// TODO: Add error handling. If errored nothing will render on screen.
+init(start);
 
-ReactDOM.render(<App />, document.getElementById("root"));
+function start(){
+    ReactDOM.render(<App />, document.getElementById("root"));
+}

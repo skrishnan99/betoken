@@ -262,7 +262,7 @@ clock = function() {
   }, 1000);
 };
 
-loadFundData = async function() {
+loadFundData = async function(callback) {
   console.log("loadFundData Called!!");
   var ROI,
     _event,
@@ -311,6 +311,7 @@ loadFundData = async function() {
       pre = "";
   }
   networkName.set(net);
+
   networkPrefix.set(pre);
   if (netID !== 4) {
     //showError("Please switch to Rinkeby Testnet in order to try Betoken Alpha");
@@ -572,10 +573,11 @@ loadFundData = async function() {
     getTransferHistory("BTKS", true);
     getTransferHistory("BTKS", false);
   }
+  callback();
 };
 
 //$("document").ready(function() {
-export var init = function() {
+export var init = function(callback) {
   //$(".menu .item").tab();
   //$("table").tablesort();
   if (web3 != null) {
@@ -634,13 +636,8 @@ export var init = function() {
     });
     */
     //Initialize Betoken object
-    return betoken.init().then(loadFundData);
+    return betoken.init().then(loadFundData(callback));
   }
-};
-
-export var getbetoken_addr = function() {
-  console.log(betoken_addr.get());
-  return betoken_addr.get();
 };
 
 /*
