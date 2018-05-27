@@ -4,7 +4,7 @@
  * Sets the first account as defaultAccount
  * @return {Promise} .then(()->)
  */
-import BigNumber from "big-number";
+import BigNumber from "bignumber.js";
 
 var ERC20, ETH_TOKEN_ADDRESS, Web3, getDefaultAccount, web3;
 

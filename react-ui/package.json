@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "big-number": "^0.4.0",
+    "bignumber.js": "5.0.0",
     "chart": "^0.1.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
