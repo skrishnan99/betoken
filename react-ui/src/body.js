@@ -2,7 +2,7 @@
 
 import { Betoken } from "./objects/betoken.js";
 
-import Chart from "chart";
+//import Chart from "chart";
 
 import BigNumber from "bignumber.js";
 
